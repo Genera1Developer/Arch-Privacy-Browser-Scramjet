@@ -1,289 +1,62 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arch Scramjet | Privacy Protected</title>
-    <link rel="icon" href="/favicon.webp" type="image/png">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #050505;
-            color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .browser-window {
-            width: 90%;
-            max-width: 900px;
-            height: 90%;
-            background-color: #1a1d24;
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            border: 3px solid #01579b;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-        }
-        .tab-bar {
-            background-color: #20232a;
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            gap: 10px;
-            overflow-x: auto;
-        }
-        .tab {
-            background-color: #2d2f38;
-            border-radius: 6px;
-            padding: 8px 12px;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            white-space: nowrap;
-            position: relative;
-            transition: background-color 0.3s ease;
-        }
-        .tab.active {
-            background-color: #3a3d48;
-        }
-        .tab:hover {
-            background-color: #3a3d48;
-        }
-        .tab .close-tab {
-            position: absolute;
-            top: 4px;
-            right: 6px;
-            background: #ff5f5f;
-            border-radius: 50%;
-            color: white;
-            font-size: 12px;
-            width: 16px;
-            height: 16px;
-            line-height: 16px;
-            text-align: center;
-            cursor: pointer;
-        }
-        .add-tab {
-            background-color: #01579b;
-            border-radius: 6px;
-            padding: 8px 12px;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .add-tab:hover {
-            background-color: #0173cc;
-        }
-        .browser-header {
-            background-color: #20232a;
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            gap: 8px;
-        }
-        .nav-button {
-            background-color: #2d2f38;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 12px;
-            font-size: 16px;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .nav-button:hover {
-            background-color: #3a3d48;
-        }
-        .url-bar {
-            flex-grow: 1;
-            background-color: #2d2f38;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            padding: 0 12px;
-            overflow: hidden;
-        }
-        .url-input {
-            background: none;
-            border: none;
-            flex-grow: 1;
-            font-size: 16px;
-            color: white;
-            outline: none;
-        }
-        .url-input::placeholder {
-            color: #999;
-        }
-        .browser-content {
-            flex-grow: 1;
-            background-color: #1a1d24;
-        }
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-        .weather {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            font-size: 14px;
-            color: #ffffff;
-        }
-        .time {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            font-size: 14px;
-            color: #ffffff;
-        }
-    </style>
-</head>
-<body>
-    <div class="weather" id="weather">🌤️ Loading weather...</div>
-    <div class="time" id="time">⏰ Loading time...</div>
-    <div class="browser-window">
-        <div class="tab-bar" id="tab-bar">
-            <div class="tab active" data-tab-id="tab-1">Tab 1 <span class="close-tab" title="Close Tab">x</span></div>
-            <div class="add-tab">+</div>
-        </div>
-        <div class="browser-header">
-            <button class="nav-button" id="back-btn">←</button>
-            <button class="nav-button" id="forward-btn">→</button>
-            <button class="nav-button" id="refresh-btn">↻</button>
-            <div class="url-bar">
-                <input type="text" class="url-input" id="url-input" placeholder="Search Bing...">
-            </div>
-        </div>
-        <div class="browser-content">
-            <iframe id="browser-iframe" src="about:blank"></iframe>
-        </div>
-    </div>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Scramjet</title>
+		<link rel="icon" href="favicon.webp" />
+		<link rel="prefetch" href="/scram/scramjet.worker.js" />
+		<link rel="prefetch" href="/scram/scramjet.shared.js" />
+		<link
+			href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&amp;family=Inter+Tight:ital,wght@0,100..900;1,100..900&amp;family=Inter:wght@100..900&amp;display=swap&amp;"
+			rel="stylesheet"
+		/>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Hind:wght@300;400;500;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Hind:wght@300;400;500;600;700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+			rel="stylesheet"
+		/>
+		<style>
+			body,
+			html,
+			#app {
+				font-family:
+					"Inter",
+					system-ui,
+					-apple-system,
+					BlinkMacSystemFont,
+					sans-serif;
+				width: 100vw;
+				height: 100vh;
+				margin: 0;
+				padding: 0;
+				background-color: #050505;
+				overflow: hidden;
+			}
 
-    <!-- Scramjet functionality scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/dreamland"></script>
-    <script src="/baremux/index.js" defer></script>
-    <script src="/scram/scramjet.controller.js"></script>
-    <script src="config.js"></script>
-    <script src="ui.js" defer></script>
+			@keyframes fade {
+				from {
+					opacity: 0;
+				}
+				to {
+					opacity: 1;
+				}
+			}
+		</style>
+	</head>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const tabBar = document.getElementById('tab-bar');
-            const iframe = document.getElementById('browser-iframe');
-            const urlInput = document.getElementById('url-input');
-            const backBtn = document.getElementById('back-btn');
-            const forwardBtn = document.getElementById('forward-btn');
-            const refreshBtn = document.getElementById('refresh-btn');
-            const weatherElement = document.getElementById('weather');
-            const timeElement = document.getElementById('time');
-
-            const tabs = {};
-            let activeTabId = 'tab-1';
-
-            tabs['tab-1'] = { url: 'about:blank' };
-
-            function switchTab(tabId) {
-                activeTabId = tabId;
-                document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-                document.querySelector(`[data-tab-id="${tabId}"]`).classList.add('active');
-                iframe.src = tabs[tabId].url;
-                urlInput.value = tabs[tabId].url === 'about:blank' ? '' : tabs[tabId].url;
-            }
-
-            function addTab() {
-                const tabId = `tab-${Object.keys(tabs).length + 1}`;
-                tabs[tabId] = { url: 'about:blank' };
-
-                const newTab = document.createElement('div');
-                newTab.className = 'tab';
-                newTab.innerHTML = `Tab ${Object.keys(tabs).length} <span class="close-tab" title="Close Tab">x</span>`;
-                newTab.dataset.tabId = tabId;
-
-                tabBar.insertBefore(newTab, document.querySelector('.add-tab'));
-                switchTab(tabId);
-            }
-
-            function closeTab(tabId) {
-                if (Object.keys(tabs).length > 1) {
-                    const tabElement = document.querySelector(`[data-tab-id="${tabId}"]`);
-                    const isActive = tabElement.classList.contains('active');
-
-                    delete tabs[tabId];
-                    tabElement.remove();
-
-                    if (isActive) {
-                        const remainingTabs = Object.keys(tabs);
-                        switchTab(remainingTabs[remainingTabs.length - 1]);
-                    }
-                }
-            }
-
-            function saveCurrentTabUrl() {
-                tabs[activeTabId].url = iframe.src;
-            }
-
-            tabBar.addEventListener('click', function (e) {
-                if (e.target.classList.contains('tab')) {
-                    saveCurrentTabUrl();
-                    switchTab(e.target.dataset.tabId);
-                } else if (e.target.classList.contains('add-tab')) {
-                    saveCurrentTabUrl();
-                    addTab();
-                } else if (e.target.classList.contains('close-tab')) {
-                    const tabId = e.target.parentElement.dataset.tabId;
-                    closeTab(tabId);
-                }
-            });
-
-            urlInput.addEventListener('keypress', function (e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    let url = this.value.trim();
-                    if (!url.match(/^(http:\/\/|https:\/\/)/)) {
-                        url = `https://www.bing.com/search?q=${encodeURIComponent(url)}`;
-                    }
-                    iframe.src = url;
-                    tabs[activeTabId].url = url;
-                }
-            });
-
-            backBtn.addEventListener('click', () => iframe.contentWindow.history.back());
-            forwardBtn.addEventListener('click', () => iframe.contentWindow.history.forward());
-            refreshBtn.addEventListener('click', () => iframe.src = iframe.src);
-
-            function updateTime() {
-                const now = new Date();
-                timeElement.textContent = `⏰ ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-            }
-            setInterval(updateTime, 1000);
-            updateTime();
-
-            async function fetchWeather() {
-                try {
-                    const res = await fetch('https://ipapi.co/json/');
-                    const data = await res.json();
-                    const { latitude, longitude } = data;
-
-                    const forecastRes = await fetch(`https://api.weather.gov/points/${latitude},${longitude}`);
-                    const forecastData = await forecastRes.json();
-                    const forecastUrl = forecastData.properties.forecast;
-
-                    const forecastResponse = await fetch(forecastUrl);
-                    const forecastDetails = await forecastResponse.json();
-                    const currentWeather = forecastDetails.properties.periods[0];
-
-                    weatherElement.textContent = `🌤️ ${currentWeather.temperature}°${currentWeather.temperatureUnit} - ${currentWeather.shortForecast}`;
-                } catch (err) {
-                    weatherElement.textContent = '⚠️ Unable to fetch weather';
-                }
-            }
-            fetchWeather();
-        });
-    </script>
-</body>
+	<body>
+		<script src="https://cdn.jsdelivr.net/npm/dreamland"></script>
+		<script src="/baremux/index.js" defer></script>
+		<script src="/scram/scramjet.controller.js"></script>
+		<script src="config.js"></script>
+		<script src="ui.js" defer></script>
+	</body>
 </html>
