@@ -1,16 +1,16 @@
 const scramjet = new ScramjetController({
-	files: {
-		wasm: "/scram/scramjet.wasm.js",
-		worker: "/scram/scramjet.worker.js",
-		client: "/scram/scramjet.client.js",
-		shared: "/scram/scramjet.shared.js",
-		sync: "/scram/scramjet.sync.js",
-	},
-	siteFlags: {
-		"https://worker-playground.glitch.me/.*": {
-			serviceworkers: true,
-		},
-	},
+  files: {
+    wasm: "/scram/scramjet.wasm.js",
+    worker: "/scram/scramjet.worker.js",
+    client: "/scram/scramjet.client.js",
+    shared: "/scram/scramjet.shared.js",
+    sync: "/scram/scramjet.sync.js",
+  },
+  siteFlags: {
+    "https://worker-playground.glitch.me/.*": {
+      serviceworkers: true,
+    },
+  },
 });
 
 scramjet.init();
@@ -18,137 +18,130 @@ navigator.serviceWorker.register("./sw.js");
 
 const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
 const flex = css`
-	display: flex;
+  display: flex;
 `;
 const col = css`
-	flex-direction: column;
+  flex-direction: column;
 `;
 
 const store = $store(
-	{
-		url: "https://google.com",
-		wispurl:
-			_CONFIG?.wispurl ||
-			(location.protocol === "https:" ? "wss" : "ws") +
-				"://" +
-				location.host +
-				"/wisp/",
-		bareurl:
-			_CONFIG?.bareurl ||
-			(location.protocol === "https:" ? "https" : "http") +
-				"://" +
-				location.host +
-				"/bare/",
-		proxy: "",
-	},
-	{ ident: "settings", backing: "localstorage", autosave: "auto" }
+  {
+    url: "https://google.com",
+    wispurl: _CONFIG?.wispurl || `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/wisp/`,
+    bareurl: _CONFIG?.bareurl || `${location.protocol === "https:" ? "https" : "http"}://${location.host}/bare/`,
+    proxy: "",
+  },
+  { ident: "settings", backing: "localstorage", autosave: "auto" }
 );
+
 connection.setTransport("/epoxy/index.mjs", [{ wisp: store.wispurl }]);
 
+// Modern CSS with cleaner variables
 function Config() {
-	this.css = `
-    transition: opacity 0.4s ease;
+  this.css = `
+    :root {
+      --background-dark: #121212;
+      --background-light: #313131;
+      --highlight-color: #4c8bf5;
+      --text-color: #fff;
+      --input-border-color: rgb(49, 49, 49);
+      --button-hover-bg: #292929;
+      --transition-time: 0.4s;
+    }
+
+    transition: opacity var(--transition-time) ease;
     :modal[open] {
-        animation: fade 0.4s ease normal;
+      animation: fade var(--transition-time) ease normal;
     }
 
     :modal::backdrop {
-     backdrop-filter: blur(3px);
+      backdrop-filter: blur(3px);
     }
 
     .buttons {
       gap: 0.5em;
     }
+
     .buttons button {
-      border: 1px solid #4c8bf5;
-      background-color: #313131;
+      border: 1px solid var(--highlight-color);
+      background-color: var(--background-dark);
       border-radius: 0.75em;
-      color: #fff;
+      color: var(--text-color);
       padding: 0.45em;
+      transition: background-color 0.3s;
     }
+
+    .buttons button:hover {
+      background-color: var(--button-hover-bg);
+    }
+
     .input_row input {
-      background-color: rgb(18, 18, 18);
-      border: 2px solid rgb(49, 49, 49);
+      background-color: var(--background-dark);
+      border: 2px solid var(--input-border-color);
       border-radius: 0.75em;
-      color: #fff;
+      color: var(--text-color);
       outline: none;
       padding: 0.45em;
     }
+
     .input_row {
-      margin-bottom: 0.5em;
-      margin-top: 0.5em;
+      margin: 0.5em 0;
     }
-    .input_row input {
-      flex-grow: 1;
-    }
+
     .centered {
       justify-content: center;
       align-items: center;
     }
   `;
 
-	function handleModalClose(modal) {
-		modal.style.opacity = 0;
-		setTimeout(() => {
-			modal.close();
-			modal.style.opacity = 1;
-		}, 250);
-	}
+  const handleModalClose = (modal) => {
+    modal.style.opacity = 0;
+    setTimeout(() => {
+      modal.close();
+      modal.style.opacity = 1;
+    }, 250);
+  };
 
-	return html`
-      <dialog class="cfg" style="background-color: #121212; color: white; border-radius: 8px;">
-        <div style="align-self: end">
-          <div class=${[flex, "buttons"]}>
-            <button on:click=${() => connection.setTransport("/baremod/index.mjs", [store.bareurl])}>use bare server 3</button>
-            <button on:click=${() =>
-							connection.setTransport("/libcurl/index.mjs", [
-								{ wisp: store.wispurl },
-							])}>use libcurl.js</button>
-              <button on:click=${() => connection.setTransport("/epoxy/index.mjs", [{ wisp: store.wispurl }])}>use epoxy</button>
-          </div>
+  return html`
+    <dialog class="cfg" style="background-color: var(--background-dark); color: var(--text-color); border-radius: 8px;">
+      <div style="align-self: end">
+        <div class=${[flex, "buttons"]}>
+          <button on:click=${() => connection.setTransport("/baremod/index.mjs", [store.bareurl])}>Use Bare Server</button>
+          <button on:click=${() => connection.setTransport("/libcurl/index.mjs", [{ wisp: store.wispurl }])}>Use libcurl.js</button>
+          <button on:click=${() => connection.setTransport("/epoxy/index.mjs", [{ wisp: store.wispurl }])}>Use Epoxy</button>
         </div>
-        <div class=${[flex, col, "input_row"]}>
-          <label for="wisp_url_input">Wisp URL:</label>
-          <input id="wisp_url_input" bind:value=${use(store.wispurl)} spellcheck="false"></input>
-        </div>
-        <div class=${[flex, col, "input_row"]}>
-          <label for="bare_url_input">Bare URL:</label>
-          <input id="bare_url_input" bind:value=${use(store.bareurl)} spellcheck="false"></input>
-        </div>
-            <div class=${[flex, "buttons", "centered"]}>
-              <button on:click=${() => handleModalClose(this.root)}>close</button>
-            </div>
-
-      </dialog>
+      </div>
+      <div class=${[flex, col, "input_row"]}>
+        <label for="wisp_url_input">Wisp URL:</label>
+        <input id="wisp_url_input" bind:value=${use(store.wispurl)} spellcheck="false" />
+      </div>
+      <div class=${[flex, col, "input_row"]}>
+        <label for="bare_url_input">Bare URL:</label>
+        <input id="bare_url_input" bind:value=${use(store.bareurl)} spellcheck="false" />
+      </div>
+      <div class=${[flex, "buttons", "centered"]}>
+        <button on:click=${() => handleModalClose(this.root)}>Close</button>
+      </div>
+    </dialog>
   `;
 }
 
 function BrowserApp() {
-	this.css = `
-    width: 100%;
-    height: 100%;
-    color: #e0def4;
-    display: flex;
-    flex-direction: column;
-    padding: 0.5em;
-    padding-top: 0;
-    box-sizing: border-box;
-
-    a {
-      color: #e0def4;
-    }
-
-    input,
-    button {
-      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,
-        sans-serif;
+  this.css = `
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: var(--background-dark);
+      color: var(--text-color);
     }
     .version {
+      font-size: 0.8rem;
+      color: #b0b0b0;
     }
     h1 {
-      font-family: "Inter Tight", "Inter", system-ui, -apple-system, BlinkMacSystemFont,
-      sans-serif;
-      margin-bottom: 0;
+      margin: 0;
+      font-family: 'Inter Tight', 'Inter', sans-serif;
     }
     iframe {
       background-color: #fff;
@@ -158,93 +151,77 @@ function BrowserApp() {
       width: 100%;
     }
 
-    input.bar {
-      font-family: "Inter";
-      padding: 0.1em;
-      padding-left: 0.3em;
-      border: none;
-      outline: none;
-      color: #fff;
-      height: 1.5em;
+    .bar {
+      padding: 0.3em;
+      font-family: 'Inter';
       border-radius: 0.3em;
-      flex: 1;
+      border: 1px solid var(--input-border-color);
+      color: var(--text-color);
+      background-color: var(--background-dark);
+      outline: none;
+    }
 
-      background-color: #121212;
-      border: 1px solid #313131;
-    }
     .input_row > label {
-      font-size: 0.7rem;
+      font-size: 0.8rem;
       color: gray;
-    }
-    p {
-      margin: 0;
-      margin-top: 0.2em;
     }
 
     .nav {
-      padding-top: 0.3em;
-      padding-bottom: 0.3em;
-      gap: 0.3em;
-    }
-    spacer {
-      margin-left: 10em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5em;
+      padding: 0.3em 0;
     }
 
     .nav button {
-      color: #fff;
-      outline: none;
-      border: none;
-      border-radius: 0.30em;
-      background-color: #121212;
-      border: 1px solid #313131;
+      background-color: var(--background-dark);
+      border: 1px solid var(--input-border-color);
+      color: var(--text-color);
+      padding: 0.6em;
+      border-radius: 0.3em;
+      transition: background-color 0.3s;
+    }
+
+    .nav button:hover {
+      background-color: var(--button-hover-bg);
     }
   `;
-	this.url = store.url;
 
-	const frame = scramjet.createFrame();
+  const frame = scramjet.createFrame();
 
-	frame.addEventListener("urlchange", (e) => {
-		if (!e.url) return;
-		this.url = e.url;
-	});
-	frame.frame.addEventListener("load", () => {
-		let url = frame.frame.contentWindow.location.href;
-		if (!url) return;
-		if (url === "about:blank") return;
+  frame.addEventListener("urlchange", (e) => {
+    if (e.url) this.url = e.url;
+  });
 
-		this.url = $scramjet.codec.decode(
-			url.substring((location.href + "/scramjet").length)
-		);
-	});
+  frame.frame.addEventListener("load", () => {
+    let url = frame.frame.contentWindow.location.href;
+    if (url && url !== "about:blank") {
+      this.url = $scramjet.codec.decode(url.substring(location.href.length + "/scramjet".length));
+    }
+  });
 
-	const handleSubmit = () => {
-		this.url = this.url.trim();
-		//  frame.go(this.url)
-		if (!this.url.startsWith("http")) {
-			this.url = "https://" + this.url;
-		}
+  const handleSubmit = () => {
+    this.url = this.url.trim();
+    if (!this.url.startsWith("http")) this.url = "https://" + this.url;
+    frame.go(this.url);
+  };
 
-		return frame.go(this.url);
-	};
+  const cfg = h(Config);
+  document.body.appendChild(cfg);
+  this.githubURL = `https://github.com/MercuryWorkshop/scramjet/commit/${$scramjet.version.build}`;
 
-	const cfg = h(Config);
-	document.body.appendChild(cfg);
-	this.githubURL = `https://github.com/MercuryWorkshop/scramjet/commit/${$scramjet.version.build}`;
-
-	return html`
-      <div>
+  return html`
+    <div>
       <div class=${[flex, "nav"]}>
-
-        <button on:click=${() => cfg.showModal()}>config</button>
+        <button on:click=${() => cfg.showModal()}>Config</button>
         <button on:click=${() => frame.back()}>&lt;-</button>
         <button on:click=${() => frame.forward()}>-&gt;</button>
         <button on:click=${() => frame.reload()}>&#x21bb;</button>
 
-        <input class="bar" bind:value=${use(this.url)} on:input=${(e) => {
-					this.url = e.target.value;
-				}} on:keyup=${(e) => e.keyCode == 13 && (store.url = this.url) && handleSubmit()}></input>
-
-        <button on:click=${() => window.open(scramjet.encodeUrl(this.url))}>open</button>
+        <input class="bar" bind:value=${use(this.url)} on:input=${(e) => { this.url = e.target.value; }} on:keyup=${(e) => e.keyCode == 13 && (store.url = this.url) && handleSubmit()} />
+        
+        <button on:click=${() => window.open(scramjet.encodeUrl(this.url))}>Open</button>
 
         <p class="version">
           <b>scramjet</b> ${$scramjet.version.version} <a href=${use(this.githubURL)}>${$scramjet.version.build}</a>
@@ -252,31 +229,30 @@ function BrowserApp() {
       </div>
       ${frame.frame}
     </div>
-    `;
+  `;
 }
-window.addEventListener("load", async () => {
-	document.body.appendChild(h(BrowserApp));
-	function b64(buffer) {
-		let binary = "";
-		const bytes = new Uint8Array(buffer);
-		const len = bytes.byteLength;
-		for (let i = 0; i < len; i++) {
-			binary += String.fromCharCode(bytes[i]);
-		}
 
-		return btoa(binary);
-	}
-	const arraybuffer = await (await fetch("/assets/scramjet.png")).arrayBuffer();
-	console.log(
-		"%cb",
-		`
-      background-image: url(data:image/png;base64,${b64(arraybuffer)});
+window.addEventListener("load", async () => {
+  document.body.appendChild(h(BrowserApp));
+
+  const b64 = (buffer) => {
+    let binary = "";
+    const bytes = new Uint8Array(buffer);
+    for (let byte of bytes) binary += String.fromCharCode(byte);
+    return btoa(binary);
+  };
+
+  const arrayBuffer = await (await fetch("/assets/scramjet.png")).arrayBuffer();
+  console.log(
+    "%cb",
+    `
+      background-image: url(data:image/png;base64,${b64(arrayBuffer)});
       color: transparent;
       padding-left: 200px;
       padding-bottom: 100px;
       background-size: contain;
       background-position: center center;
       background-repeat: no-repeat;
-  `
-	);
+    `
+  );
 });
